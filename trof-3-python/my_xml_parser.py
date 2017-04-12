@@ -9,7 +9,7 @@ class MyXmlMusicParser(object):
 
     def __str__(self):
         """Pretty print. Task #3"""
-        return etree.tostring(self.tree, pretty_print=True)
+        return etree.tostring(self.tree, pretty_print=True, encoding='unicode')
 
     def add_elements(self, artists, albums, songs):
         """Adds elemens. Artist->album->songs. Task #4"""
@@ -39,17 +39,27 @@ class MyXmlMusicParser(object):
         if not to_print:
             return childrens
         for children in childrens:
-            print(etree.tostring(children, pretty_print=True))
+            print(etree.tostring(children, pretty_print=True, encoding='unicode'))
 
 
-    def get_elements_by_attr_value(self, attr_value, to_print=False):
+    def get_elements_by_attr_value(self, node, attr_value, l, to_print=False):
         """Task #2.3"""
+        for i in node.getchildren():
+            for a in i.items():
+                if a[1] == attr_value and to_print:
+                    l.append(i)
+                    print(etree.tostring(i, pretty_print=True, encoding='unicode'))
+            if i.getchildren():
+                self.get_elements_by_attr_value(i, attr_value, l, True)
+
+
+
 
 
 if __name__ == '__main__':
     parser = MyXmlMusicParser(XML_PATH)
     artists = [{'Name': "Kanye West"}]
-    albums = [{'Title': "Life Of Pablo", 'Release_data': "2K16", 'Type': "Album"}]
+    albums = [{'Title': "Life Of Pablo", 'Release_date': "2K16", 'Type': "Album"}]
     songs = [{'No': "1", "Title":"Ultralight Beam", "Music": "Kanye West", "Length": "5:20", "Genre":"Hip-hop"},
              {'No': "2", "Title":"Fade", "Music": "Larry Heard, Robert Owens", "Length": "3:14", "Genre":"House"}]
     parser.add_elements(artists, albums, songs)
@@ -57,5 +67,5 @@ if __name__ == '__main__':
     parser.delete_elements_by_xpath("//Artist[@Name='Metallica']")
     parser.print_attr("Name")
     parser.get_elements_by_root(parser.tree.getroot())
-    parser.get_elements_by_attr_value("Paris")
+    parser.get_elements_by_attr_value(parser.tree.getroot(), "1", [])
     #print(parser)
